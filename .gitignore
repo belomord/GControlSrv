@@ -1,4 +1,8 @@
 /ExtLib/ActionManager
 /bin/Debug/*.dll
+/bin/Debug/*.exe
 /bin/Debug/*.pdb
+/bin/Debug/*.config
+/*/bin
+/*/obj
 /.vs

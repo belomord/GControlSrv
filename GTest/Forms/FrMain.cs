@@ -347,5 +347,13 @@ namespace GTest.Forms
       DialogResult dr = TimeMassageBox.Show("Text", "Caption", 5);
       Log.Wrl("MessageBoxEx: " + dr);
     }
+
+    private void test7ToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      Log.Wrl(typeof(BaseTest).ToString());
+      Log.Wrl(typeof(EDMTest).ToString());
+      Log.Wrl(BaseTest.TestInfoFileName);
+      Log.Wrl(EDMTest.TestInfoFileName);
+    }
   }
 }

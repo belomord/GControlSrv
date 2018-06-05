@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.IO;
+using System.Reflection;
 using System.Windows.Forms;
 
 using BSerialization;
@@ -262,6 +263,7 @@ namespace MTest
 
   public class BaseTest
   {
+
     public const string FN_TestInfo = "_testinf.cfg";
     public const string FN_StageInfo = "_stage.cfg";
 
@@ -284,6 +286,8 @@ namespace MTest
 
     public BaseTestInfo TestInfo { get => _testInfo; set => _testInfo = value; }
     public BaseStageInfo StageInfo { get => _stageInfo; set => _stageInfo = value; }
+
+    public const string TestInfoFileName = "base.tst";
 
     public MTResult DoPause(int pauseLength)
     {

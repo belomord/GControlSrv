@@ -28,6 +28,9 @@ namespace MTest
 
   public class EDMTest:BaseTest
   {
+
+    public new const string TestInfoFileName = "edm.tst";
+
     protected override Type TypeOfTestInfo() => (this.GetType() == typeof(EDMTest)) ? typeof(EDMTestInfo) : null;
     protected override Type TypeOfStageInfo() => (this.GetType() == typeof(EDMTest)) ? typeof(EDMStageInfo) : null;
 

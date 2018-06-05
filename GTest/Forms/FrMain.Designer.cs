@@ -80,6 +80,7 @@
       this.gPUInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.eDMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.miOpenEDM = new System.Windows.Forms.ToolStripMenuItem();
+      this.test7ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.pnlMain.SuspendLayout();
       this.panel3.SuspendLayout();
       this.tbcMain.SuspendLayout();
@@ -479,7 +480,8 @@
             this.test4ToolStripMenuItem,
             this.test5ToolStripMenuItem,
             this.test6ToolStripMenuItem,
-            this.testMessageBoxTestToolStripMenuItem});
+            this.testMessageBoxTestToolStripMenuItem,
+            this.test7ToolStripMenuItem});
       this.miTest.Name = "miTest";
       this.miTest.Size = new System.Drawing.Size(40, 20);
       this.miTest.Text = "Test";
@@ -547,28 +549,28 @@
       // miMSIABStart
       // 
       this.miMSIABStart.Name = "miMSIABStart";
-      this.miMSIABStart.Size = new System.Drawing.Size(152, 22);
+      this.miMSIABStart.Size = new System.Drawing.Size(110, 22);
       this.miMSIABStart.Text = "Start";
       this.miMSIABStart.Click += new System.EventHandler(this.MiMSIABStart_Click);
       // 
       // miRestart
       // 
       this.miRestart.Name = "miRestart";
-      this.miRestart.Size = new System.Drawing.Size(152, 22);
+      this.miRestart.Size = new System.Drawing.Size(110, 22);
       this.miRestart.Text = "Restart";
       this.miRestart.Click += new System.EventHandler(this.MiRestart_Click);
       // 
       // miReload
       // 
       this.miReload.Name = "miReload";
-      this.miReload.Size = new System.Drawing.Size(152, 22);
+      this.miReload.Size = new System.Drawing.Size(110, 22);
       this.miReload.Text = "Reload";
       this.miReload.Click += new System.EventHandler(this.MiReload_Click);
       // 
       // closeToolStripMenuItem
       // 
       this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-      this.closeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.closeToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
       this.closeToolStripMenuItem.Text = "Close";
       this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
       // 
@@ -609,6 +611,13 @@
       this.miOpenEDM.Size = new System.Drawing.Size(131, 22);
       this.miOpenEDM.Text = "Open EDM";
       this.miOpenEDM.Click += new System.EventHandler(this.miOpenEDM_Click);
+      // 
+      // test7ToolStripMenuItem
+      // 
+      this.test7ToolStripMenuItem.Name = "test7ToolStripMenuItem";
+      this.test7ToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+      this.test7ToolStripMenuItem.Text = "Test7";
+      this.test7ToolStripMenuItem.Click += new System.EventHandler(this.test7ToolStripMenuItem_Click);
       // 
       // FrMain
       // 
@@ -697,6 +706,7 @@
     private System.Windows.Forms.ToolStripMenuItem test6ToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem gPUInfoToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem testMessageBoxTestToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem test7ToolStripMenuItem;
   }
 }
 

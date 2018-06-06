@@ -73,7 +73,7 @@ namespace GTest.Forms
     
     private void FrEDM_Load(object sender, EventArgs e)
     {
-      string fn = CommonProc.ApplicationExePath + "edm.tst";
+      string fn = CommonProc.ApplicationExePath + EDMTest.TestInfoFileName;
       if (File.Exists(fn))
       {
         Test = (EDMTest)BJsonSerializator.DeserializeObjectFromFile(fn);

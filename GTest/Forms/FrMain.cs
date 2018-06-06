@@ -355,5 +355,15 @@ namespace GTest.Forms
       Log.Wrl(BaseTest.TestInfoFileName);
       Log.Wrl(EDMTest.TestInfoFileName);
     }
+
+    private void test8ToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      BaseTest bt = new BaseTest();
+      bt.TestPath = "12345";
+      string s = BJsonSerializator.SerializeObject(bt);
+      Log.Wrl(s);
+      bt = BJsonSerializator.DeserializeObject(s) as BaseTest;
+      Log.Wrl(bt.TestPath);
+    }
   }
 }

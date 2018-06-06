@@ -303,6 +303,8 @@ namespace MTest
       return result;
     }
 
+
+
     public static bool CheckResult(MTResult result, MTResult normalResult = MTResult.Success) => result == normalResult;
     public MTResult CheckPath(bool CreateIfNotExist = true)
     {
@@ -395,7 +397,7 @@ namespace MTest
       {
         _stageInfo = CreateStageInfo();
         //InitStageInfo();
-        BJsonSerializator.SerializeObjectToFile(_stageInfo, FNStageInfo);
+        //BJsonSerializator.SerializeObjectToFile(_stageInfo, FNStageInfo);
       }
 
       result = MTResult.OHMError;

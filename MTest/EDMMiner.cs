@@ -60,10 +60,10 @@ namespace MTest
           {
             response.ResponseStr = sReader.ReadLine();
           }
-          catch (IOException ex)
+          catch (Exception ex)
           {
-            response.Error = EDMError.ReadTimeOut;
-            response.ErrorStr = ex.Message;
+            response.Exception = ex;
+            response.Error = EDMError.Exception;
           }
           //catch (OutOfMemoryException ex)
           //{
@@ -76,8 +76,8 @@ namespace MTest
       }
       catch (Exception ex)
       {
-        response.Error = EDMError.Other;
-        response.ErrorStr = ex.Message;
+        response.Exception = ex;
+        response.Error = EDMError.Exception;
       }
 
       return response;
@@ -104,7 +104,7 @@ namespace MTest
   public enum EDMError
   {
     None = 0,
-    ReadTimeOut = 1,
+    Exception = 1,
     Other = 0xFF
   }
 
@@ -135,13 +135,15 @@ namespace MTest
   {
     public string ResponseStr;
     public EDMError Error;
-    public string ErrorStr;
+    public Exception Exception;
+
+    public string ErrorStr()=> (Exception == null) ? "" : Exception.Message;
 
     public EDMResponse(string response = "")
     {
       ResponseStr = response;
       Error = EDMError.None;
-      ErrorStr = "";
+      Exception = null;
     }
   }
 
@@ -383,6 +385,12 @@ namespace MTest
       Response = response;
       if (response.Error == EDMError.None)
         ParseETHResult(response.ResponseStr);
+    }
+
+    public EDMResult(string json)
+    {
+      Response = new EDMResponse(json);
+      ParseETHResult(json);
     }
 
   }

@@ -187,6 +187,7 @@ namespace GTest.Forms
 
     MTResult TestMiner()
     {
+      string s;
       TestMinerBreakFlag = false;
       EDMTestInfo eti = new EDMTestInfo();
       UpdateEDMTestInfo(eti);
@@ -212,14 +213,22 @@ namespace GTest.Forms
             Application.DoEvents();
           }
 
-          ssl1.Text = "Miner test: " + ((int)((t1 - t0) / 1000)).ToString();
+
+          //ssl1.Text = "Miner test: " + ((int)((t1 - t0) / 1000)).ToString();
 
           EDMResult er = em.GetCurrentResult();
+          s = "Miner test: " + ((int)((t1 - t0) / 1000)).ToString()+". "+
+            (
+              (er.Data == null) ? 
+              "ErrorStr: " + er.Response.ErrorStr() : 
+               ssl1.Text += "ETHTotalHashrate: " + er.Data.ETHTotalHashrate.ToString()
+            );
 
-          if (er.Data == null)
-            ssl1.Text += ". ErrorStr: " + er.Response.ErrorStr;
-          else
-            ssl1.Text += ". ETHTotalHashrate: " + er.Data.ETHTotalHashrate.ToString();// er.Data.DCRHashrate;
+          ssl1.Text = s;
+          //if (er.Data == null)
+          //  ssl1.Text += (". ErrorStr: " + er.Response.ErrorStr());
+          //else
+          //  ssl1.Text += ". ETHTotalHashrate: " + er.Data.ETHTotalHashrate.ToString();// er.Data.DCRHashrate;
 
           Application.DoEvents();
         }

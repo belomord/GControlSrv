@@ -54,6 +54,12 @@
       this.label10 = new System.Windows.Forms.Label();
       this.nudProfile = new System.Windows.Forms.NumericUpDown();
       this.groupBox5 = new System.Windows.Forms.GroupBox();
+      this.btnBreakTestMiner = new System.Windows.Forms.Button();
+      this.btnTestMiner = new System.Windows.Forms.Button();
+      this.label15 = new System.Windows.Forms.Label();
+      this.label14 = new System.Windows.Forms.Label();
+      this.nudPort = new System.Windows.Forms.NumericUpDown();
+      this.txtHost = new System.Windows.Forms.TextBox();
       this.txtArguments = new System.Windows.Forms.TextBox();
       this.txtPacketFilePath = new System.Windows.Forms.TextBox();
       this.txtExeFileName = new System.Windows.Forms.TextBox();
@@ -62,14 +68,8 @@
       this.label11 = new System.Windows.Forms.Label();
       this.btnNewTest = new System.Windows.Forms.Button();
       this.btnContinueTest = new System.Windows.Forms.Button();
-      this.txtHost = new System.Windows.Forms.TextBox();
-      this.nudPort = new System.Windows.Forms.NumericUpDown();
-      this.label14 = new System.Windows.Forms.Label();
-      this.label15 = new System.Windows.Forms.Label();
       this.ssMain = new System.Windows.Forms.StatusStrip();
       this.ssl1 = new System.Windows.Forms.ToolStripStatusLabel();
-      this.btnTestMiner = new System.Windows.Forms.Button();
-      this.btnBreakTestMiner = new System.Windows.Forms.Button();
       ((System.ComponentModel.ISupportInitialize)(this.nudThermalLimit)).BeginInit();
       this.groupBox1.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.nudMemoryClockIncStage2)).BeginInit();
@@ -385,6 +385,70 @@
       this.groupBox5.TabStop = false;
       this.groupBox5.Text = "Miner information";
       // 
+      // btnBreakTestMiner
+      // 
+      this.btnBreakTestMiner.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.btnBreakTestMiner.Enabled = false;
+      this.btnBreakTestMiner.Location = new System.Drawing.Point(336, 76);
+      this.btnBreakTestMiner.Name = "btnBreakTestMiner";
+      this.btnBreakTestMiner.Size = new System.Drawing.Size(56, 23);
+      this.btnBreakTestMiner.TabIndex = 11;
+      this.btnBreakTestMiner.Text = "Break";
+      this.btnBreakTestMiner.UseVisualStyleBackColor = true;
+      this.btnBreakTestMiner.Click += new System.EventHandler(this.btnBreakTestMiner_Click);
+      // 
+      // btnTestMiner
+      // 
+      this.btnTestMiner.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.btnTestMiner.Location = new System.Drawing.Point(398, 76);
+      this.btnTestMiner.Name = "btnTestMiner";
+      this.btnTestMiner.Size = new System.Drawing.Size(57, 23);
+      this.btnTestMiner.TabIndex = 10;
+      this.btnTestMiner.Text = "Test";
+      this.btnTestMiner.UseVisualStyleBackColor = true;
+      this.btnTestMiner.Click += new System.EventHandler(this.btnTestMiner_Click);
+      // 
+      // label15
+      // 
+      this.label15.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.label15.AutoSize = true;
+      this.label15.Location = new System.Drawing.Point(337, 55);
+      this.label15.Name = "label15";
+      this.label15.Size = new System.Drawing.Size(32, 13);
+      this.label15.TabIndex = 9;
+      this.label15.Text = "Port: ";
+      // 
+      // label14
+      // 
+      this.label14.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.label14.AutoSize = true;
+      this.label14.Location = new System.Drawing.Point(337, 28);
+      this.label14.Name = "label14";
+      this.label14.Size = new System.Drawing.Size(35, 13);
+      this.label14.TabIndex = 8;
+      this.label14.Text = "Host: ";
+      // 
+      // nudPort
+      // 
+      this.nudPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.nudPort.Location = new System.Drawing.Point(376, 51);
+      this.nudPort.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+      this.nudPort.Name = "nudPort";
+      this.nudPort.Size = new System.Drawing.Size(78, 20);
+      this.nudPort.TabIndex = 7;
+      // 
+      // txtHost
+      // 
+      this.txtHost.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.txtHost.Location = new System.Drawing.Point(376, 24);
+      this.txtHost.Name = "txtHost";
+      this.txtHost.Size = new System.Drawing.Size(78, 20);
+      this.txtHost.TabIndex = 6;
+      // 
       // txtArguments
       // 
       this.txtArguments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -461,52 +525,12 @@
       this.btnContinueTest.UseVisualStyleBackColor = true;
       this.btnContinueTest.Click += new System.EventHandler(this.btnContinueTest_Click);
       // 
-      // txtHost
-      // 
-      this.txtHost.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.txtHost.Location = new System.Drawing.Point(376, 24);
-      this.txtHost.Name = "txtHost";
-      this.txtHost.Size = new System.Drawing.Size(78, 20);
-      this.txtHost.TabIndex = 6;
-      // 
-      // nudPort
-      // 
-      this.nudPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.nudPort.Location = new System.Drawing.Point(376, 51);
-      this.nudPort.Maximum = new decimal(new int[] {
-            65535,
-            0,
-            0,
-            0});
-      this.nudPort.Name = "nudPort";
-      this.nudPort.Size = new System.Drawing.Size(78, 20);
-      this.nudPort.TabIndex = 7;
-      // 
-      // label14
-      // 
-      this.label14.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.label14.AutoSize = true;
-      this.label14.Location = new System.Drawing.Point(337, 28);
-      this.label14.Name = "label14";
-      this.label14.Size = new System.Drawing.Size(35, 13);
-      this.label14.TabIndex = 8;
-      this.label14.Text = "Host: ";
-      // 
-      // label15
-      // 
-      this.label15.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.label15.AutoSize = true;
-      this.label15.Location = new System.Drawing.Point(337, 55);
-      this.label15.Name = "label15";
-      this.label15.Size = new System.Drawing.Size(32, 13);
-      this.label15.TabIndex = 9;
-      this.label15.Text = "Port: ";
-      // 
       // ssMain
       // 
       this.ssMain.AutoSize = false;
       this.ssMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ssl1});
+      this.ssMain.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
       this.ssMain.Location = new System.Drawing.Point(0, 454);
       this.ssMain.Name = "ssMain";
       this.ssMain.Size = new System.Drawing.Size(474, 18);
@@ -516,30 +540,8 @@
       // ssl1
       // 
       this.ssl1.Name = "ssl1";
-      this.ssl1.Size = new System.Drawing.Size(112, 13);
+      this.ssl1.Size = new System.Drawing.Size(112, 15);
       this.ssl1.Text = "XXXXXXXXXXXXXXX";
-      // 
-      // btnTestMiner
-      // 
-      this.btnTestMiner.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnTestMiner.Location = new System.Drawing.Point(398, 76);
-      this.btnTestMiner.Name = "btnTestMiner";
-      this.btnTestMiner.Size = new System.Drawing.Size(57, 23);
-      this.btnTestMiner.TabIndex = 10;
-      this.btnTestMiner.Text = "Test";
-      this.btnTestMiner.UseVisualStyleBackColor = true;
-      this.btnTestMiner.Click += new System.EventHandler(this.btnTestMiner_Click);
-      // 
-      // btnBreakTestMiner
-      // 
-      this.btnBreakTestMiner.Enabled = false;
-      this.btnBreakTestMiner.Location = new System.Drawing.Point(336, 76);
-      this.btnBreakTestMiner.Name = "btnBreakTestMiner";
-      this.btnBreakTestMiner.Size = new System.Drawing.Size(56, 23);
-      this.btnBreakTestMiner.TabIndex = 11;
-      this.btnBreakTestMiner.Text = "Break";
-      this.btnBreakTestMiner.UseVisualStyleBackColor = true;
-      this.btnBreakTestMiner.Click += new System.EventHandler(this.btnBreakTestMiner_Click);
       // 
       // FrEDM
       // 

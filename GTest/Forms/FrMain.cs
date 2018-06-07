@@ -371,5 +371,28 @@ namespace GTest.Forms
       edmtst.Load(fn);
       Log.Wrl(edmtst.TestInfo.GPUId + " " + edmtst.TestInfo.ThermalLimit.ToString() + " " + edmtst.StageInfo.MemoryCloc.ToString());
     }
+
+    private void test9ToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      int t;
+      var salmons = new List<EDMTest>();
+
+      t = Environment.TickCount;
+      for (int i = 0; i < 100000; i++)
+      {
+        salmons.Add(new EDMTest());
+        salmons[i].TestInfo.CoreClock = i * 10;
+      }
+
+      Log.Wrl("dt: " + (Environment.TickCount-t));
+      t = Environment.TickCount;
+      string fn = CommonProc.ApplicationExePath + @"salmons.tmp";
+      BJsonSerializator.SerializeObjectToFile(salmons, fn);
+      Log.Wrl("dt: " + (Environment.TickCount - t));
+      t = Environment.TickCount;
+      List<EDMTest> salmons2 = (List<EDMTest>) BJsonSerializator.DeserializeObjectFromFile(fn);
+      Log.Wrl("dt: " + (Environment.TickCount - t));
+      Log.Wrl("[] = " + salmons2[salmons2.Count-1].TestInfo.CoreClock);
+    }
   }
 }

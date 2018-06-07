@@ -53,7 +53,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseMiner.cs" />
     <Compile Include="BaseTest.cs" />
+    <Compile Include="EDMMiner.cs" />
     <Compile Include="EDMTest.cs" />
     <Compile Include="GPUInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

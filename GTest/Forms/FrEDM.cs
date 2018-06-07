@@ -24,7 +24,7 @@ namespace GTest.Forms
       InitializeComponent();
     }
 
-    public EDMTestInfo EDMTestInfo;
+   //public EDMTestInfo EDMTestInfo;
 
     public EDMTest Test = null;
 
@@ -47,6 +47,8 @@ namespace GTest.Forms
       txtExeFileName.Text = eti.MinerInf.ExeFileName;
       txtPacketFilePath.Text = eti.MinerInf.PacketFilePath;
       txtArguments.Text = eti.MinerInf.Arguments;
+      txtHost.Text = eti.MinerInf.Host;
+      nudPort.Value = eti.MinerInf.Port;
     }
 
     public void UpdateEDMTestInfo(EDMTestInfo eti)
@@ -68,36 +70,99 @@ namespace GTest.Forms
       eti.MinerInf.ExeFileName = txtExeFileName.Text;
       eti.MinerInf.PacketFilePath = txtPacketFilePath.Text;
       eti.MinerInf.Arguments = txtArguments.Text;
+      eti.MinerInf.Host = txtHost.Text;
+      eti.MinerInf.Port = (int)nudPort.Value;
     }
 
-    
+    private string TestPathFileName => CommonProc.ApplicationExePath + typeof(EDMTest).ToString() + ".inf";
+    private string TestCommonPath => CommonProc.ApplicationExePath + @"Tests\" + Test.GetType().ToString() + @"\";
+
+    private MTResult DoTest(bool NewTest)
+    {
+      MTResult result = MTResult.Success;
+      string fn = "";
+
+      UpdateEDMTestInfo(Test.TestInfo);
+
+      if (String.IsNullOrWhiteSpace(Test.TestInfo.GPUId))
+        result = MTResult.BadData;
+
+      if (BaseTest.CheckResult(result))
+      {
+        fn = NewTest ? TestCommonPath + CommonProc.DateTimeToStr(DateTime.Now) + @"_" + Test.TestInfo.GPUId + ".tst" : "";
+        result = Test.Save(fn);
+      }
+
+      if (BaseTest.CheckResult(result))
+      {
+        try
+        {
+          fn = Test.FileName;
+          using (StreamWriter file = new StreamWriter(TestPathFileName, false))
+          {
+            file.Write(fn);
+            file.Close();
+          }
+        }
+        catch
+        {
+          result = MTResult.FileOutputError;
+        }
+      }
+
+      if (BaseTest.CheckResult(result))
+        result = Test.DoTest(NewTest);
+
+
+      return result;
+    }
+
     private void FrEDM_Load(object sender, EventArgs e)
     {
-      string fn = CommonProc.ApplicationExePath + EDMTest.TestInfoFileName;
-      if (File.Exists(fn))
-      {
-        Test = (EDMTest)BJsonSerializator.DeserializeObjectFromFile(fn);
+      Test = null;
+      DialogResult dr = DialogResult.Cancel;
 
-        DialogResult dr = TimeMassageBox.Show("Text", "Caption", 5);
+      if (File.Exists(TestPathFileName))
+      {
+        try
+        {
+          string fntst;
+          using (StreamReader file = File.OpenText(TestPathFileName))
+          {
+            fntst = file.ReadToEnd();
+            file.Close();
+          }
+          Test = (EDMTest)BaseTest.LoadTest(fntst);
+        }
+        catch
+        {
+        }
+
+        //if (Test!=null)
+        //{
+        //  UpdateForm(Test.TestInfo);
+        //  Application.DoEvents();
+        //  dr = TimeMassageBox.Show("Warning!", "Unfinished test exist.\nContinue?", 30);
+        //}
       }
 
       if (Test == null)
-        EDMTestInfo = new EDMTestInfo();
-      else
-        EDMTestInfo = Test.TestInfo;
+      {
+        Test = new EDMTest();
+        UpdateForm(Test.TestInfo);
+      }
 
-      UpdateForm(EDMTestInfo);
-
+      UpdateForm(Test.TestInfo);
       Application.DoEvents();
 
-      if ((Test != null) && (!Test.CheckTestForExit(Test.StageInfo)) )
+      if ((Test != null) && (Test.IsTestBroken()))
       {
-        //Test.CreateTestInfo
+        dr = TimeMassageBox.Show("Warning!", "Unfinished test exist.\nContinue?", 30);
 
-        //DialogResult dr = TimeMassageBox.Show("Найден незавершенный тест.\n Продолжить его", "Test", 30);
-        //if (dr == DialogResult.OK)
-        //  Test.DoTest();
+        if (dr == DialogResult.OK)
+          DoTest(false);
       }
+
 
     }
 
@@ -108,14 +173,76 @@ namespace GTest.Forms
         txtGPUId.Text = GPUId;
     }
 
-
-    public MTResult StartTest()
+    private void btnNewTest_Click(object sender, EventArgs e)
     {
-      MTResult result = MTResult.Success;
-      EDMTestInfo = new EDMTestInfo();
-      UpdateEDMTestInfo(EDMTestInfo);
+      DoTest(true);
+    }
 
+    private void btnContinueTest_Click(object sender, EventArgs e)
+    {
+      DoTest(false);
+    }
+
+    bool TestMinerBreakFlag = true;
+
+    MTResult TestMiner()
+    {
+      TestMinerBreakFlag = false;
+      EDMTestInfo eti = new EDMTestInfo();
+      UpdateEDMTestInfo(eti);
+      EDMMiner em = new EDMMiner((EDMMinerInfo)eti.MinerInf);
+
+      MTResult result = em.Start();
+
+      if (BaseTest.CheckResult(result))
+      {
+        int t0 = Environment.TickCount;
+        int t1 = t0;
+        int t2 = t1;
+        ssl1.Text = "Miner test: " + ((int)((t1 - t0) / 1000)).ToString();
+
+        while (!TestMinerBreakFlag)
+        {
+          t1 = Environment.TickCount;
+
+          t2 = t1;
+          while (((t2 - t1) <= 500) && (!TestMinerBreakFlag))
+          {
+            t2 = Environment.TickCount;
+            Application.DoEvents();
+          }
+
+          ssl1.Text = "Miner test: " + ((int)((t1 - t0) / 1000)).ToString();
+
+          EDMResult er = em.GetCurrentResult();
+
+          if (er.Data == null)
+            ssl1.Text += ". ErrorStr: " + er.Response.ErrorStr;
+          else
+            ssl1.Text += ". ETHTotalHashrate: " + er.Data.ETHTotalHashrate.ToString();// er.Data.DCRHashrate;
+
+          Application.DoEvents();
+        }
+
+        result = em.Close();
+      }
+      ssl1.Text = "Miner test: " + result.ToString();
       return result;
+    }
+
+    private void btnTestMiner_Click(object sender, EventArgs e)
+    {
+      btnTestMiner.Enabled = false;
+      btnBreakTestMiner.Enabled = true;
+      Application.DoEvents();
+      TestMiner();
+      btnTestMiner.Enabled = true;
+      btnBreakTestMiner.Enabled = false;
+    }
+
+    private void btnBreakTestMiner_Click(object sender, EventArgs e)
+    {
+      TestMinerBreakFlag = true;
     }
   }
 }

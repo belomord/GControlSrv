@@ -18,7 +18,7 @@ namespace MTest
     public int MemoryClockIncStage1 = 50;
     public int MemoryClockIncStage2 = -10;
 
-    public MinerInfo MinerInf = new MinerInfo("EthDcrMiner64.exe", @"?????\Claymore's Dual Ethereum+Decred_Siacoin_Lbry_Pascal AMD+NVIDIA GPU Miner v9.7\start.bat", "");
+    public MinerInfo MinerInf = new EDMMinerInfo();
   }
 
   public class EDMStageInfo: BaseStageInfo
@@ -29,47 +29,12 @@ namespace MTest
   public class EDMTest:BaseTest
   {
 
-    public new const string TestInfoFileName = "edm.tst";
-
     protected override Type TypeOfTestInfo() => (this.GetType() == typeof(EDMTest)) ? typeof(EDMTestInfo) : null;
     protected override Type TypeOfStageInfo() => (this.GetType() == typeof(EDMTest)) ? typeof(EDMStageInfo) : null;
 
     public new EDMTestInfo TestInfo  { get => (_testInfo as EDMTestInfo); set => _testInfo = value; }
     public new EDMStageInfo StageInfo { get => (_stageInfo as EDMStageInfo); set => _stageInfo = value; }
 
-    //protected override void InitStageInfo()
-    //{
-    //  base.InitStageInfo();
-    //  StageInfo.Stage = 1;
-    //  StageInfo.MemoryCloc = TestInfo.MemoryClockStart;
-    //}
-
-    //public override BaseStageInfo GetFailureStageInfo(BaseStageInfo CurrentStageInfo)
-    //{
-    //  //return base.GetFailureStageInfo(CurrentStageInfo);
-    //  EDMStageInfo result = (EDMStageInfo)CurrentStageInfo.Clone();
-    //  if (result.Stage == 1)
-    //  {
-    //    result.Stage = 2;
-    //    result.Iteration = 0;
-    //  }
-
-    //  result.MemoryCloc = result.MemoryCloc + TestInfo.MemoryClockIncStage2;
-
-    //  return result;
-    //}
-
-    //public override BaseStageInfo GetNextStageInfo(BaseStageInfo currentStageInfo)
-    //{
-    //  //return base.GetNextStageInfo(CurrentStageInfo);
-    //  EDMStageInfo result = (EDMStageInfo)currentStageInfo.Clone();
-    //  if (result.Stage == 1)
-    //  {
-    //    result.MemoryCloc = result.MemoryCloc + TestInfo.MemoryClockIncStage1;
-    //  }
-
-    //  return result;
-    //}
 
     public override bool CheckTestForExit(BaseStageInfo CheckedStageInfo)
     {
@@ -78,25 +43,6 @@ namespace MTest
     }
 
     MTResult MsiABToMTResult(MSIABControlState MsiABResult) => MsiABResult == MSIABControlState.Success ? MTResult.Success : MTResult.MSIABError;
-
-    //int MemoryClockIncStage
-    //{
-    //  get
-    //  {
-    //    int result = 0;
-    //    switch (StageInfo.Stage)
-    //    {
-    //      case 1: 
-    //        result = TestInfo.MemoryClockIncStage1;
-    //        break;
-
-    //      case 2:
-    //        result = TestInfo.MemoryClockIncStage2;
-    //        break;
-    //    }
-    //    return result;
-    //  }
-    //}
 
     public override void UpdateStartStageInfo()
     {

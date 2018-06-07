@@ -99,13 +99,13 @@ namespace GTest.Forms
 
     private void Test2ToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      BaseTestTemp btt = new BaseTestTemp();
-      string path = CommonProc.ApplicationExePath + "tmp";
-      TestControl.StoreTo(btt, path);
+      //BaseTestTemp btt = new BaseTestTemp();
+      //string path = CommonProc.ApplicationExePath + "tmp";
+      //TestControl.StoreTo(btt, path);
 
-      BaseTest bt = TestControl.RestoreFrom(path);
-      Log.Wrl(bt.GetType().ToString());
-      Log.Wrl((bt as BaseTestTemp).Y.ToString());
+      //BaseTest bt = TestControl.RestoreFrom(path);
+      //Log.Wrl(bt.GetType().ToString());
+      //Log.Wrl((bt as BaseTestTemp).Y.ToString());
     }
 
     private void Test3ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -121,35 +121,35 @@ namespace GTest.Forms
 
     private void Test4ToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      string testPath = CommonProc.ApplicationExePath + "tmp";
+      //string testPath = CommonProc.ApplicationExePath + "tmp";
 
-      //TestControl.RegistredTest rt = new TestControl.RegistredTest(testPath);
-      //rt.TestPath = testPath;
-      //string json = BJsonSerialisator.SerializeObject(rt);
-      //Log.Wrl(json);
+      ////TestControl.RegistredTest rt = new TestControl.RegistredTest(testPath);
+      ////rt.TestPath = testPath;
+      ////string json = BJsonSerialisator.SerializeObject(rt);
+      ////Log.Wrl(json);
 
-      //rt.TestPath = "123";
-      //object O = BJsonSerialisator.DeserializeObject(json);
-      //rt = O as TestControl.RegistredTest;
-      //Log.Wrl(rt.TestPath);
+      ////rt.TestPath = "123";
+      ////object O = BJsonSerialisator.DeserializeObject(json);
+      ////rt = O as TestControl.RegistredTest;
+      ////Log.Wrl(rt.TestPath);
 
-      //return;
+      ////return;
 
-      EDMTest edmTest = new EDMTest();
-      edmTest.TestInfo = (EDMTestInfo)edmTest.CreateTestInfo();
-      //Log.Wrl(edmTest.TestInfo.ThermalLimit.ToString());
+      //EDMTest edmTest = new EDMTest();
+      //edmTest.TestInfo = (EDMTestInfo)edmTest.CreateTestInfo();
+      ////Log.Wrl(edmTest.TestInfo.ThermalLimit.ToString());
 
-      edmTest.TestPath = testPath;
-      TestControl.StoreTest(edmTest);
-      TestControl.RegisterCurrentTest(edmTest);
+      //edmTest.TestPath = testPath;
+      //TestControl.StoreTest(edmTest);
+      //TestControl.RegisterCurrentTest(edmTest);
 
-      if (TestControl.IsCurrentRegistredTest)
-      {
-        BaseTest baseTest = TestControl.LoadCurrentTest();
-        Log.Wrl(baseTest.GetType().ToString());
+      //if (TestControl.IsCurrentRegistredTest)
+      //{
+      //  BaseTest baseTest = TestControl.LoadCurrentTest();
+      //  Log.Wrl(baseTest.GetType().ToString());
 
-        baseTest.DoTest();
-      }
+      //  //baseTest.DoTest();
+      //}
     }
 
 
@@ -352,18 +352,24 @@ namespace GTest.Forms
     {
       Log.Wrl(typeof(BaseTest).ToString());
       Log.Wrl(typeof(EDMTest).ToString());
-      Log.Wrl(BaseTest.TestInfoFileName);
-      Log.Wrl(EDMTest.TestInfoFileName);
     }
 
     private void test8ToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      BaseTest bt = new BaseTest();
-      bt.TestPath = "12345";
-      string s = BJsonSerializator.SerializeObject(bt);
-      Log.Wrl(s);
-      bt = BJsonSerializator.DeserializeObject(s) as BaseTest;
-      Log.Wrl(bt.TestPath);
+      EDMTest edmtst = new EDMTest();
+      string fn = CommonProc.ApplicationExePath + @"tmp\tmp.tst";
+      edmtst.TestInfo.GPUId = "12345";
+      edmtst.TestInfo.ThermalLimit = 100;
+      edmtst.StageInfo.MemoryCloc = 1800;
+      edmtst.Save(fn);
+
+      BaseTest basetst = BaseTest.LoadTest(fn);
+      edmtst = (EDMTest)basetst;
+      Log.Wrl(edmtst.TestInfo.GPUId + " " + edmtst.TestInfo.ThermalLimit.ToString()+" "+edmtst.StageInfo.MemoryCloc.ToString());
+      edmtst = new EDMTest();
+      Log.Wrl(edmtst.TestInfo.GPUId + " " + edmtst.TestInfo.ThermalLimit.ToString() + " " + edmtst.StageInfo.MemoryCloc.ToString());
+      edmtst.Load(fn);
+      Log.Wrl(edmtst.TestInfo.GPUId + " " + edmtst.TestInfo.ThermalLimit.ToString() + " " + edmtst.StageInfo.MemoryCloc.ToString());
     }
   }
 }

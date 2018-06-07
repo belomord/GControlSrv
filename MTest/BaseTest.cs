@@ -13,197 +13,6 @@ using Belomor.Common;
 
 namespace MTest
 {
-  public static class TestControl
-  {
-    public class RegistredTest
-    {
-      public RegistredTest() { }
-
-      public RegistredTest(string testPath)
-      {
-        TestPath = testPath ?? throw new ArgumentNullException(nameof(testPath));
-      }
-
-      public RegistredTest(BaseTest baseTest)
-      {
-        if (baseTest == null)
-          throw new ArgumentNullException(nameof(baseTest));
-
-        TestPath = baseTest.TestPath;
-      }
-
-      public string TestPath { get; set; } = "";
-    }
-
-    public const string FN_TestCfg = "_test.cfg";
-    public const string FN_CurrentTest = "_current.cfg";
-
-    public static string FNCurrentTest { get => CommonProc.ApplicationExePath + FN_CurrentTest; }
-
-    public static BaseTest RestoreFrom(string fileName)
-    {
-      BaseTest result = null;
-
-      string fn = fileName.Trim();
-
-      if (Directory.Exists(fn))
-        fn = CommonProc.FinPath(fn) + FN_TestCfg;
-
-      if (!File.Exists(fn))
-        return result;
-
-      try
-      {
-        result = (BaseTest)BJsonSerializator.DeserializeObjectFromFile(fn);
-      }
-      catch
-      {
-        result = null;
-      }
-
-      if (result!=null)
-        result.TestPath = CommonProc.FinPath(Path.GetDirectoryName(fn));
-
-      return result;
-    }
-
-    public static bool StoreTo(BaseTest baseTest, string fileName)
-    {
-      bool result = false;
-
-      string fn = fileName.Trim();
-      string fp = "";
-
-      if (Directory.Exists(fn))
-      {
-        fp = fn;
-        fn = CommonProc.FinPath(fp) + FN_TestCfg;
-      }
-      else
-      {
-        fp = CommonProc.FinPath(Path.GetDirectoryName(fn));
-      }
-
-
-      if (!Directory.Exists(fp))
-      {
-        try
-        {
-          Directory.CreateDirectory(fileName);
-        }
-        catch
-        {
-          return result;
-        }
-      }
-      else
-      {
-        try
-        {
-          if (File.Exists(fn))
-            File.Delete(fn);
-        }
-        catch
-        {
-          return result;
-        }
-      }
-
-      result = BJsonSerializator.SerializeObjectToFile(baseTest, fn);
-
-      return result;
-    }
-
-    public static bool StoreTest(BaseTest baseTest)
-    {
-      if (baseTest == null)
-        return false;
-
-      if (!Directory.Exists(baseTest.TestPath))
-      {
-        try
-        {
-          Directory.CreateDirectory(baseTest.TestPath);
-        }
-        catch
-        {
-          return false;
-        }
-      }
-
-      return StoreTo(baseTest, baseTest.TestPath);
-    }
-
-    public static bool IsCurrentRegistredTest
-    {
-      get
-      {
-        bool result = File.Exists(FNCurrentTest);
-
-        if (result)
-        {
-          try
-          {
-            RegistredTest rt = (RegistredTest)BJsonSerializator.DeserializeObjectFromFile(FNCurrentTest);
-            result = (rt != null) && Directory.Exists(rt.TestPath);
-          }
-          catch
-          {
-            result = false;
-          }
-        }
-
-        return result;
-      }
-    }
-
-    public static MTResult RegisterCurrentTest(BaseTest baseTest)
-    {
-      MTResult result = MTResult.Unknown;
-
-      RegistredTest rt = new RegistredTest(baseTest);
-      if (BJsonSerializator.SerializeObjectToFile(rt, FNCurrentTest))
-        result = MTResult.Success;
-      else
-        result = MTResult.FileOutputError;
-
-        return result;
-    }
-
-    public static MTResult UnregisterCurrentTest()
-    {
-      MTResult result;
-      try
-      {
-        if (File.Exists(FNCurrentTest))
-          File.Delete(FNCurrentTest);
-        result = MTResult.Success;
-      }
-      catch
-      {
-        result = MTResult.FileDeleteError;
-      }
-      return result;
-    }
-
-    public static BaseTest LoadCurrentTest()
-    {
-      BaseTest result=null;
-
-      if (File.Exists(FNCurrentTest))
-      {
-        try
-        {
-          RegistredTest rt = (RegistredTest)BJsonSerializator.DeserializeObjectFromFile(FNCurrentTest);
-          if ((rt != null) && Directory.Exists(rt.TestPath))
-            result = RestoreFrom(rt.TestPath);
-        }
-        catch { }
-      }
-      return result;
-    }
-  }
-
   public enum MTResult
   {
     Success = 0x0000,
@@ -211,12 +20,16 @@ namespace MTest
     MSIABError = 0x0002,
     MiningError = 0x0003,
     OHMError =  0x0004,
+    BadData = 0x0005,
+    ExtAppStartError = 0x0006,
+    ExtAppCloseError = 0x0007,
 
     FileError = 0x0100,
     PathError = 0x0101,
     FileOutputError = 0x0102,
     FileInputError = 0x0103,
     FileDeleteError = 0x0104,
+    BadFileName = 0x0105,
 
     Unknown = 0xFFFF
   }
@@ -225,24 +38,10 @@ namespace MTest
   {
     Success = 0x0000,
     Start = 0x0001,
-    Break = 0x0002,
-
+    UserBreak = 0x0002,
+    Finish = 0x0003,
 
     Failure = 0x000F
-  }
-
-  public struct MinerInfo
-  {
-    public string ExeFileName;
-    public string PacketFilePath;
-    public string Arguments;
-
-    public MinerInfo(string exeFileName, string packetFilePath, string arguments)
-    {
-      ExeFileName = exeFileName ?? throw new ArgumentNullException(nameof(exeFileName));
-      PacketFilePath = packetFilePath ?? throw new ArgumentNullException(nameof(packetFilePath));
-      Arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
-    }
   }
 
   public class BaseTestInfo: BJsonCloneableInfo
@@ -276,10 +75,16 @@ namespace MTest
     public string TestPath { get; set; }
 
     [JsonIgnore]
-    public string FNTestInfo => CommonProc.FinPath(TestPath) + FN_TestInfo;
+    public string FileName { get; set; } = "";
 
     [JsonIgnore]
-    public string FNStageInfo => CommonProc.FinPath(TestPath) + FN_StageInfo;
+    public string DataPath => String.IsNullOrWhiteSpace(FileName) ? "" : FileName + @".dat\";
+
+    //[JsonIgnore]
+    //public string FNTestInfo => DataPath + FN_TestInfo;
+
+    //[JsonIgnore]
+    //public string FNStageInfo => DataPath + FN_StageInfo;
 
     [JsonIgnore]
     public GPUInfo GPUInf { get; set; } = null;
@@ -287,7 +92,81 @@ namespace MTest
     public BaseTestInfo TestInfo { get => _testInfo; set => _testInfo = value; }
     public BaseStageInfo StageInfo { get => _stageInfo; set => _stageInfo = value; }
 
-    public const string TestInfoFileName = "base.tst";
+    public static BaseTest LoadTest(string FileName)
+    {
+      BaseTest result = null;
+
+      if (File.Exists(FileName))
+      {
+        try
+        {
+          result = (BaseTest)BJsonSerializator.DeserializeObjectFromFile(FileName);
+          result.FileName = FileName;
+        }
+        catch (Exception)
+        {
+          result = null;
+        }
+      }
+
+      return result;
+    }
+
+    public BaseTest()
+    {
+      TestInfo = CreateTestInfo();
+      StageInfo = CreateStageInfo();
+    }
+
+    public MTResult Save(string FileName = "")
+    {
+      MTResult result = MTResult.Success;
+
+      string fn = string.IsNullOrWhiteSpace(FileName) ? this.FileName : FileName;
+
+      if (String.IsNullOrWhiteSpace(fn))
+        result = MTResult.BadFileName;
+
+      if (CheckResult(result))
+        this.FileName = fn;
+
+      if (CheckResult(result))
+      {
+        if (!BJsonSerializator.SerializeObjectToFile(this, fn))
+          result = MTResult.FileOutputError;
+      }
+
+      return result;
+    }
+
+    public MTResult Load(string FileName = "")
+    {
+      MTResult result = MTResult.Success;
+      BaseTest tmp = null;
+
+      string fn = string.IsNullOrWhiteSpace(FileName) ? this.FileName : FileName;
+
+      if (String.IsNullOrWhiteSpace(fn) || (!File.Exists(fn)))
+        result = MTResult.BadFileName;
+
+      if (CheckResult(result))
+        tmp = BaseTest.LoadTest(FileName);
+
+      if (tmp == null)
+        result = MTResult.FileInputError;
+
+      if (CheckResult(result))
+      {
+        TestInfo = tmp.TestInfo;
+        StageInfo = tmp.StageInfo;
+        this.FileName = fn;
+
+        tmp.TestInfo = null;
+        tmp.StageInfo = null;
+      }
+
+      return result;
+    }
 
     public MTResult DoPause(int pauseLength)
     {
@@ -302,8 +181,6 @@ namespace MTest
 
       return result;
     }
-
-
 
     public static bool CheckResult(MTResult result, MTResult normalResult = MTResult.Success) => result == normalResult;
     public MTResult CheckPath(bool CreateIfNotExist = true)
@@ -357,52 +234,11 @@ namespace MTest
       return result;
     }
 
-    //protected virtual void InitTestInfo()
-    //{
-    //  TestInfo.StartTime = DateTime.Now;
-    //}
-
-    //protected virtual void InitStageInfo()
-    //{
-    //  //TestInfo.StartTime = DateTime.Now;
-
-    //  StageInfo.Stage = 1;
-    //  StageInfo.Iteration = 0;
-    //}
-
-    public MTResult InitGPU(string GPUId)
+    public MTResult InitGPU()
     {
-      MTResult result = MTResult.Unknown;
+      MTResult result = MTResult.OHMError;
 
-      return result;
-    }
-
-    public virtual MTResult PrepareTest()
-    {
-      MTResult result = MTResult.Unknown;
-
-      BaseTestInfo titemp = (BaseTestInfo)BJsonSerializator.DeserializeObjectFromFile(FNTestInfo);
-      if (titemp != null)
-        _testInfo = titemp;
-
-      if (_testInfo == null)
-        _testInfo = CreateTestInfo();
-        //InitTestInfo();
-
-      BaseStageInfo sitemp = (BaseStageInfo)BJsonSerializator.DeserializeObjectFromFile(FNStageInfo);
-      if (sitemp != null)
-        _stageInfo = sitemp;
-
-      if (_stageInfo == null)
-      {
-        _stageInfo = CreateStageInfo();
-        //InitStageInfo();
-        //BJsonSerializator.SerializeObjectToFile(_stageInfo, FNStageInfo);
-      }
-
-      result = MTResult.OHMError;
-
-      if ((titemp != null) && (!String.IsNullOrWhiteSpace(titemp.GPUId)))
+      if (!String.IsNullOrWhiteSpace(TestInfo.GPUId))
       {
         GPUInf = new GPUInfo(TestInfo.GPUId);
         if (!String.IsNullOrWhiteSpace(GPUInf.DeviceName))
@@ -412,21 +248,19 @@ namespace MTest
       return result;
     }
 
-    //public virtual BaseStageInfo GetFailureStageInfo(BaseStageInfo currentStageInfo)
-    //{
-    //  BaseStageInfo result = (BaseStageInfo)currentStageInfo.Clone();
-    //  result.Stage++;
-    //  result.Iteration = 0;
-    //  return result;
-    //}
-
-    protected MTResult SaveStageInfo(BaseStageInfo currentStageInfo)
+    public virtual MTResult PrepareTest(bool NewTest)
     {
-      MTResult result;
-      if (BJsonSerializator.SerializeObjectToFile(currentStageInfo, FNStageInfo))
-        result = MTResult.Success;
-      else
-        result = MTResult.FileOutputError;
+      MTResult result = MTResult.Success;
+
+      if (CheckResult(result))
+        result = InitGPU();
+
+      if (CheckResult(result) && NewTest)
+      {
+        TestInfo.StartTime = DateTime.Now;
+        StageInfo.State = StageState.Start;
+      }
+
       return result;
     }
 
@@ -436,7 +270,7 @@ namespace MTest
       StageInfo.Iteration = 0;
     }
 
-    public virtual void UpdateBreakedStageInfo()
+    public virtual void UpdateUserBrokenStageInfo()
     {
     }
 
@@ -451,7 +285,7 @@ namespace MTest
       StageInfo.Iteration = 0;
     }
 
-    public virtual void SetNextStageInfo()
+    public virtual void DoNextStageInfo()
     {
       //BaseStageInfo result = (BaseStageInfo)PrevStageInfo.Clone();
 
@@ -461,8 +295,8 @@ namespace MTest
           UpdateStartStageInfo();
           break;
 
-        case StageState.Break:
-          UpdateBreakedStageInfo();
+        case StageState.UserBreak:
+          UpdateUserBrokenStageInfo();
           break;
 
         case StageState.Success:
@@ -485,21 +319,33 @@ namespace MTest
     public virtual MTResult DoTestIteration()
     {
       StageInfo.State = StageState.Failure;
-      MTResult result = SaveStageInfo(StageInfo);
+      MTResult result = Save();
       return result;
     }
 
-    public virtual MTResult DoTest()
+    public bool IsTestBroken()
     {
-      MTResult result = PrepareTest();
+      return (StageInfo.State != StageState.Start) && (StageInfo.State != StageState.Finish);
+    }
+
+    public virtual MTResult DoTest(bool NewTest)
+    {
+      MTResult result = Save();
+
+      if (!CheckResult(result))
+        result = PrepareTest(NewTest);
 
       if (!CheckResult(result))
         return result;
 
-      while ((!CheckTestForExit(StageInfo)) && CheckResult(result))
+      while (CheckResult(result) && (!CheckTestForExit(StageInfo)))
       {
-        SetNextStageInfo();
-        result = DoTestIteration();
+        DoNextStageInfo();
+        StageInfo.State = StageState.Failure;
+        result = Save();
+        break;
+        if (CheckResult(result))
+          result = DoTestIteration();
       }
 
       #region Old

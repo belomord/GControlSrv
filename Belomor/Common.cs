@@ -11,10 +11,49 @@ using Microsoft.Win32;
 
 namespace Belomor.Common
 {
+
+  public enum BFileDeleteResult 
+  {
+    Success = 0x0000,
+
+    ArgumentException = 0x0001,
+    ArgumentNullException= 0x0002,
+    DirectoryNotFoundException= 0x0003,
+    IOException= 0x0004,
+    NotSupportedException= 0x0005,
+    PathTooLongException= 0x0006,
+    UnauthorizedAccessException= 0x0007,
+  }
+
+
   public static class CommonProc
   {
     public static string ApplicationExeName = Application.ExecutablePath;
     public static string ApplicationExePath = Path.GetDirectoryName(Application.ExecutablePath) + @"\";
+
+    public static Exception DeleteFileE(string FileName)
+    {
+      string fn = String.IsNullOrEmpty(FileName) || String.IsNullOrWhiteSpace(FileName) ? "" : FileName.Trim();
+
+      Exception result = null;
+
+      try
+      {
+        if (File.Exists(fn))
+          File.Delete(fn);
+      }
+      catch (Exception e)
+      {
+        result = e;
+      }
+
+      return result;
+    }
+
+    public static bool DeleteFile(string FileName)
+    {
+      return DeleteFileE(FileName) == null;
+    }
 
     public static string FinPath(string path)
     {
@@ -116,6 +155,16 @@ namespace Belomor.Common
     public static string FullDateTimeFormatStr(string delimeter="-", bool useMillisecond=true)
     {
       return FullDateTimeFormatStr(delimeter, delimeter, delimeter, useMillisecond);
+    }
+
+    public static string DateTimeToStr(DateTime dateTime, string dateDelimeter, string timeDelimeter, string dateTimeDelimeter, bool useMillisecond)
+    {
+      return dateTime.ToString(FullDateTimeFormatStr(dateDelimeter, timeDelimeter, dateTimeDelimeter, useMillisecond));
+    }
+
+    public static string DateTimeToStr(DateTime dateTime, string delimeter = "-", bool useMillisecond = true)
+    {
+      return dateTime.ToString(FullDateTimeFormatStr(delimeter, delimeter, delimeter, useMillisecond));
     }
 
     public static string FullDTFormatStr => FullDateTimeFormatStr();

@@ -52,13 +52,21 @@ namespace BSerialization
 
       try
       {
-        StreamWriter file;
-        file = new StreamWriter(fileName.Trim(), false);
-        file.Write(SerializeObject(value));
-        file.Close();
+        string dn = Directory.GetParent(fileName).FullName;
+        if (!Directory.Exists(dn))
+          Directory.CreateDirectory(dn);
+
+        using (StreamWriter file = new StreamWriter(fileName.Trim(), false))
+        {
+          file.Write(SerializeObject(value));
+          file.Close();
+        }
         result = true;
       }
-      catch { }
+      catch (Exception e)
+      {
+        throw (e);
+      }
 
       return result;
     }
@@ -72,9 +80,12 @@ namespace BSerialization
 
       try
       {
-        StreamReader file = File.OpenText(fileName.Trim());
-        string json = file.ReadToEnd();
-        file.Close();
+        string json;
+        using (StreamReader file = File.OpenText(fileName.Trim()))
+        {
+          json = file.ReadToEnd();
+          file.Close();
+        }
         result = DeserializeObject(json);
       }
       catch

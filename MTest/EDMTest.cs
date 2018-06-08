@@ -36,10 +36,10 @@ namespace MTest
     public new EDMStageInfo StageInfo { get => (_stageInfo as EDMStageInfo); set => _stageInfo = value; }
 
 
-    public override bool CheckTestForExit(BaseStageInfo CheckedStageInfo)
+    public override bool CheckTestForExit()
     {
       //return base.CheckTestForExit(CurrentStageInfo);
-      return (CheckedStageInfo.Stage >= 2) && (CheckedStageInfo.State == StageState.Success);
+      return (StageInfo.Stage >= 2) && (StageInfo.State == StageState.Success);
     }
 
     MTResult MsiABToMTResult(MSIABControlState MsiABResult) => MsiABResult == MSIABControlState.Success ? MTResult.Success : MTResult.MSIABError;
@@ -83,22 +83,22 @@ namespace MTest
     {
 
 
-      MTResult result = MTResult.Success;
+      MTResult result = base.DoTestIteration();
 
-      //return base.DoTestIteration(CurrentStageInfo);
-      //EDMStageInfo currStageInfo = (EDMStageInfo)currentStageInfo;
+      if (CheckResult(result))
+      {
+        //Остановим MsiAb
+        MSIABControl.Close();
 
-      //Остановим MsiAb
-      MSIABControl.Close();
+        //Установим параметры MsiAb
+        MSIABProfileSettings currentProfileSettings = MSIABControl.LoadProfileSetting(TestInfo.GPUId, TestInfo.ProfileIndex);
+        currentProfileSettings.CoreClk = TestInfo.CoreClock;
+        currentProfileSettings.PowerLimit = TestInfo.PowerLimit;
+        currentProfileSettings.ThermalLimit = TestInfo.ThermalLimit;
+        currentProfileSettings.MemClk = StageInfo.MemoryCloc;
 
-      //Установим параметры MsiAb
-      MSIABProfileSettings currentProfileSettings = MSIABControl.LoadProfileSetting(TestInfo.GPUId, TestInfo.ProfileIndex);
-      currentProfileSettings.CoreClk = TestInfo.CoreClock;
-      currentProfileSettings.PowerLimit = TestInfo.PowerLimit;
-      currentProfileSettings.ThermalLimit = TestInfo.ThermalLimit;
-      currentProfileSettings.MemClk = StageInfo.MemoryCloc;
-
-      result = MsiABToMTResult(MSIABControl.SaveProfileSetting(TestInfo.ProfileIndex, currentProfileSettings));
+        result = MsiABToMTResult(MSIABControl.SaveProfileSetting(TestInfo.ProfileIndex, currentProfileSettings));
+      }
 
       //Запустим MsiAb
       if (CheckResult(result))
@@ -109,19 +109,11 @@ namespace MTest
         result = DoPause(10000);
 
       //Запутим майнинг
+      EDMMiner em;
       if (CheckResult(result))
       {
-        AppStartInfo asi = new AppStartInfo//("EthDcrMiner64.exe", AppExtOperation.Kill, 10000, 2000);
-        {
-          Operation = AppExtOperation.Kill,
-          WaitForInputIdleTime = 5000,
-          WaitForMainWindowHandle = 5000,
-          CloseWaitingTime = 2000
-        };
-
-        ExecutableApp miningApp = String.IsNullOrWhiteSpace(TestInfo.MinerInf.PacketFilePath) ? new ExecutableApp() : new PacketApp();
-        if (! miningApp.Start(String.IsNullOrWhiteSpace(TestInfo.MinerInf.PacketFilePath) ? TestInfo.MinerInf.ExeFileName : TestInfo.MinerInf.PacketFilePath, TestInfo.MinerInf.Arguments, asi))
-          result = MTResult.MiningError;
+        em = new EDMMiner((EDMMinerInfo)TestInfo.MinerInf);
+        result = em.Start();
       }
 
       //Ждем некоторое время в цикле переодически считывая параметры карты и майнера
@@ -132,7 +124,10 @@ namespace MTest
         while (CheckResult(result) && ((Environment.TickCount - t) < TestInfo.MiningIterationTime*1000))
         {
           result = DoPause(TestInfo.GettingMiningDataTimeStep*1000);
+          if (CheckResult(result))
+          {
 
+          }
         }
       }
 

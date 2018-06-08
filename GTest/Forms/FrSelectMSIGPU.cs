@@ -56,7 +56,9 @@ namespace GTest.Forms
       //dgvMSI.Columns.Add(new DataGridViewTextBoxColumn() { HeaderText = "GpuId", ReadOnly = true, Width = 400 });
 
       dgvMSI.Columns.Add(new DataGridViewTextBoxColumn() { Name = "", ReadOnly = true, Width = 30 });
-      dgvMSI.Columns.Add(new DataGridViewTextBoxColumn() { Name = "Index", ReadOnly = true, Width = normalColumnWidth });
+      dgvMSI.Columns.Add(new DataGridViewTextBoxColumn() { Name = "Index", ReadOnly = true, Width = (int)normalColumnWidth / 2 });
+      dgvMSI.Columns.Add(new DataGridViewTextBoxColumn() { Name = "Type", ReadOnly = true, Width = (int)normalColumnWidth / 2 });
+      dgvMSI.Columns.Add(new DataGridViewTextBoxColumn() { Name = "Type Idx", ReadOnly = true, Width = (int)normalColumnWidth / 2 });
       dgvMSI.Columns.Add(new DataGridViewTextBoxColumn() { Name = "Device", ReadOnly = true, Width = normalColumnWidth * 2 });
       dgvMSI.Columns.Add(new DataGridViewTextBoxColumn() { Name = "Family", ReadOnly = true, Width = normalColumnWidth });
       dgvMSI.Columns.Add(new DataGridViewTextBoxColumn() { Name = "GpuId", ReadOnly = true, Width = 400 });
@@ -68,9 +70,15 @@ namespace GTest.Forms
 
       for (int i = 0; i < MSIABControl.GpuCount; i++)
       {
+        GPUDrvType DrvType;
+        int DrvTypeIndex;
+
+        MSIABControl.GetType(i, out DrvType, out DrvTypeIndex);
         dgvMSI.Rows.Add(new String[]
                             { i.ToString(),
                               MSIABControl.MAHM.GpuEntries[i].Index.ToString(),
+                              DrvType.ToString(),
+                              DrvTypeIndex.ToString(),
                               MSIABControl.MAHM.GpuEntries[i].Device,
                               MSIABControl.MAHM.GpuEntries[i].Family,
                               MSIABControl.MAHM.GpuEntries[i].GpuId

@@ -170,10 +170,74 @@ namespace MApps
       return result;
     }
 
+    public static int GetAtiNvidiaCardIndex(string gpuId)
+    {
+      int result = -1;
+      int DrvTypeIndex;
+      GPUDrvType DrvType;
+      int j = -1;
+
+      for (int i = 0; i < GpuCount; i++)
+      {
+        MSIABControl.GetType(i, out DrvType, out DrvTypeIndex);
+        if ((DrvType == GPUDrvType.AMD) || (DrvType == GPUDrvType.NVIDIA))
+        {
+          j++;
+          if (MAHM.GpuEntries[i].GpuId == gpuId)
+          {
+            result = j;
+            break;
+          }
+        }
+      }
+
+      return result;
+    }
+
+    public static GPUDrvTypes DrvTypes = new GPUDrvTypes();
+    public static GPUDrvType GetTypeByName(string GPUName)
+    {
+      GPUDrvType result = GPUDrvType.Unknown;
+
+      if (!string.IsNullOrWhiteSpace(GPUName))
+      {
+        string s = GPUName.Trim();
+        if (s.Contains("NVIDIA") || s.Contains("GEFORCE") || s.Contains("GTX"))
+          result = GPUDrvType.NVIDIA;
+        else if (s.Contains("AMD") || s.Contains("RADEON") || s.Contains("RX"))
+          result = GPUDrvType.AMD;
+      }
+
+      return result;
+    }
+
+    public static void GetType(int MSIABIndex, out GPUDrvType DrvType, out int DrvTypeIndex)
+    {
+      DrvType = GPUDrvType.Unknown;
+      DrvTypeIndex = -1;
+
+      for (int iDrvType = 0; iDrvType <= GPUDrvTypes.MaxGPUDrvTypeInt; iDrvType++)
+      {
+        for (int i = 0; i < DrvTypes.MSIABIndexes[iDrvType].Count; i++)
+        {
+          if (DrvTypes.MSIABIndexes[iDrvType][i] == MSIABIndex)
+          {
+            DrvTypeIndex = i;
+            DrvType = (GPUDrvType)iDrvType;
+            break;
+          }
+        }
+
+        if (DrvTypeIndex != -1)
+          break;
+      }
+    }
+
     public static bool ReloadMSIABInfo()
     {
       bool result = true;
       ExceptionList.Clear();
+      DrvTypes = new GPUDrvTypes();
 
       try
       {
@@ -192,6 +256,9 @@ namespace MApps
         {
           if (MAHM.GpuEntries[i].GpuId.Substring(0, 3).ToUpper() != "VEN")
             result = false;
+
+          if (result)
+            DrvTypes.MSIABIndexes[(int)GetTypeByName(MAHM.GpuEntries[i].Device)].Add((int)MAHM.GpuEntries[i].Index);
         }
       }
       catch (Exception e)
@@ -285,5 +352,27 @@ namespace MApps
         return MSIABControlState.ProcessError;
     }
 
+  }
+
+  public enum GPUDrvType: int
+  {
+    Unknown = 0,
+    AMD = 1,
+    NVIDIA = 2
+    
+  }
+
+  public class GPUDrvTypes
+  {
+    public List<int>[] MSIABIndexes { get; set; }
+
+    public static int MaxGPUDrvTypeInt => Enum.GetValues(typeof(GPUDrvType)).Cast<int>().Max();
+
+    public GPUDrvTypes()
+    {
+      MSIABIndexes = new List<int>[MaxGPUDrvTypeInt+1];
+      for (int i = 0; i <= MaxGPUDrvTypeInt; i++)
+        MSIABIndexes[i] = new List<int>();
+    }
   }
 }

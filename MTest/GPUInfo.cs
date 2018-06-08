@@ -9,12 +9,6 @@ using OpenHardwareMonitor.Hardware;
 
 namespace MTest
 {
-  public enum GPUDrvType
-  {
-    Unknown = 0,
-    AMD = 1,
-    NVIDIA = 2
-  }
 
 
   public struct OHGPUInformation
@@ -97,7 +91,7 @@ namespace MTest
     public string DeviceName { get; private set; } = "";
     public GPUDrvType GPUType { get; private set; } = GPUDrvType.Unknown;
 
-    int tempIndex = 0;
+    //int tempIndex = 0;
 
     public GPUInfo(string GPUId)
     {
@@ -107,40 +101,44 @@ namespace MTest
       if (MAState == MSIABControlState.Success)
       {
 
-        for (int i = 0; i < MSIABControl.GpuCount; i++)
-        {
-          if (MSIABControl.MAHM.GpuEntries[i].GpuId.ToUpper().Trim() == MAGPUId.ToUpper())
-          {
-            MAIndex = i;
-            DeviceName = MSIABControl.MAHM.GpuEntries[i].Device;
-            break;
-          }
-        }
+        //for (int i = 0; i < MSIABControl.GpuCount; i++)
+        //{
+        //  if (MSIABControl.MAHM.GpuEntries[i].GpuId.ToUpper().Trim() == MAGPUId.ToUpper())
+        //  {
+        //    MAIndex = i;
+        //    DeviceName = MSIABControl.MAHM.GpuEntries[i].Device;
+        //    break;
+        //  }
+        //}
 
-        for (int i = 0; i <= MAIndex; i++)
-        {
-          if (MSIABControl.MAHM.GpuEntries[i].Device == DeviceName)
-            tempIndex++;
-        }
+        //for (int i = 0; i <= MAIndex; i++)
+        //{
+        //  if (MSIABControl.MAHM.GpuEntries[i].Device == DeviceName)
+        //    tempIndex++;
+        //}
+        OHIndex = MSIABControl.GetAtiNvidiaCardIndex(GPUId);
       }
 
-      if ((DeviceName != "") && (tempIndex>0))
+      if ((DeviceName != "") && (OHIndex>=0))//(tempIndex>0))
       {
         OHComputer.Open();
         OHComputer.GPUEnabled = true;
 
-        for (int i = 0; i < OHComputer.Hardware.Length; i++)
-        {
-          if (OHComputer.Hardware[i].Name.ToUpper().Contains(DeviceName.ToUpper()) || DeviceName.ToUpper().Contains(OHComputer.Hardware[i].Name.ToUpper()))
-          {
-            tempIndex--;
-            if (tempIndex == 0)
-            {
-              OHIndex = i;
-              break;
-            }
-          }
-        }
+        //for (int i = 0; i < OHComputer.Hardware.Length; i++)
+        //{
+        //  if (OHComputer.Hardware[i].Name.ToUpper().Contains(DeviceName.ToUpper()) || DeviceName.ToUpper().Contains(OHComputer.Hardware[i].Name.ToUpper()))
+        //  {
+        //    tempIndex--;
+        //    if (tempIndex == 0)
+        //    {
+        //      OHIndex = i;
+        //      break;
+        //    }
+        //  }
+        //}
+
+        if (OHComputer.Hardware[OHIndex].Name.ToUpper() != DeviceName.ToUpper())
+          OHIndex = -1;
 
         if (OHIndex >= 0)
         {

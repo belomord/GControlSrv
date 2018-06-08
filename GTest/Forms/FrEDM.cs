@@ -221,7 +221,7 @@ namespace GTest.Forms
             (
               (er.Data == null) ? 
               "ErrorStr: " + er.Response.ErrorStr() : 
-               ssl1.Text += "ETHTotalHashrate: " + er.Data.ETHTotalHashrate.ToString()
+               "ETHTotalHashrate: " + er.Data.ETHTotalHashrate.ToString()
             );
 
           ssl1.Text = s;

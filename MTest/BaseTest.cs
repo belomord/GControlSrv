@@ -311,9 +311,9 @@ namespace MTest
       //return result;
     }
 
-    public virtual bool CheckTestForExit(BaseStageInfo CheckedStageInfo)
+    public virtual bool CheckTestForExit()
     {
-      return false;
+      return ((StageInfo.State == StageState.Finish));
     }
 
     public virtual MTResult DoTestIteration()
@@ -338,12 +338,14 @@ namespace MTest
       if (!CheckResult(result))
         return result;
 
-      while (CheckResult(result) && (!CheckTestForExit(StageInfo)))
+      while (CheckResult(result) && (!CheckTestForExit()))
       {
         DoNextStageInfo();
         StageInfo.State = StageState.Failure;
         result = Save();
+
         break;
+
         if (CheckResult(result))
           result = DoTestIteration();
       }

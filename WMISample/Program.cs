@@ -109,6 +109,8 @@ namespace WMISample
           Console.WriteLine("VideoModeDescription: {0}", queryObj["VideoModeDescription"]);
           Console.WriteLine("VideoProcessor: {0}", queryObj["VideoProcessor"]);
         }
+
+        Console.ReadLine();
       }
       catch (ManagementException e)
       {

@@ -15,6 +15,20 @@ using Belomor.IniFile;
 
 namespace MApps
 {
+
+  public class MSIABConfigSettings
+  {
+    public string LogPath { get; set; } = "";
+    public int EnableLog { get; set; } = 0;
+    public int RecreateLog { get; set; } = 0;
+  }
+
+  public class MSIABConfig
+  {
+    //public MSIABConfigSettings Settings = new MSIABConfigSettings()
+
+  }
+
   public struct MSIABProfileSettings
   {
     public const int EmptyProfileSettingValue = unchecked((int)0xFFFFFFFF);
@@ -373,6 +387,109 @@ namespace MApps
       MSIABIndexes = new List<int>[MaxGPUDrvTypeInt+1];
       for (int i = 0; i <= MaxGPUDrvTypeInt; i++)
         MSIABIndexes[i] = new List<int>();
+    }
+  }
+
+  public class MSIABLog
+  {
+    public class GPULog
+    {
+      public string Device { get; set; } = "";
+      public int Index { get; set; } = -1;
+    }
+
+
+
+    public class LogStr
+    {
+
+      public void Build(string str)
+      {
+        Correct = false;
+        try
+        {
+          Values = str.Split(new char[] {','}, StringSplitOptions.None).ToList<string>();
+          Type = Convert.ToInt32(Values[0].Trim());
+          Values.RemoveAt(0);
+          this.DateTime = System.DateTime.ParseExact(Values[1].Trim(), "dd-MM-yyyy hh:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+          Values.RemoveAt(0);
+          Correct = true;
+        }
+        catch
+        {
+          Clear();
+        }
+      }
+
+      public void Clear()
+      {
+        Correct = false;
+        Type = -1;
+        DateTime = System.DateTime.MinValue;
+        Values = new List<string>();
+      }
+
+      public LogStr(string str)
+      {
+        Build(str);
+      }
+
+      public LogStr()
+      {
+        Clear();
+      }
+
+    public bool Correct { get; private set; } = false;
+      public int Type { get; private set; } = -1;
+      public DateTime DateTime { get; private set; } = System.DateTime.MinValue;
+      public List<string> Values { get; private set; } = new List<string>();
+
+    }
+
+    public bool Load(string fileName)
+    {
+      bool res = File.Exists(fileName.Trim());
+
+      try
+      {
+        if (res)
+        {
+          using (StreamReader sr = new StreamReader(fileName.Trim(), Encoding.GetEncoding("windows-1251")))
+          {
+            string s;
+            LogStr ls = new LogStr();
+
+
+            while (sr.Peek() >= 0)
+            {
+              ls.Build(sr.ReadLine());
+              if (!ls.Correct)
+                continue;
+
+              switch (ls.Type)
+              {
+                case 0:
+                  break;
+
+                case 1:
+                  for (int i = 0; i < ls.Values.Count; i++)
+                  {
+
+                  }
+                  break;
+
+              }
+
+            }
+          }
+        }
+      }
+      catch
+      {
+        res = false;
+      }
+
+      return res;
     }
   }
 }

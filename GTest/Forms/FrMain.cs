@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Net;
 
 using MSI.Afterburner;
 using Belomor.Common;
@@ -393,6 +394,27 @@ namespace GTest.Forms
       List<EDMTest> salmons2 = (List<EDMTest>) BJsonSerializator.DeserializeObjectFromFile(fn);
       Log.Wrl("dt: " + (Environment.TickCount - t));
       Log.Wrl("[] = " + salmons2[salmons2.Count-1].TestInfo.CoreClock);
+    }
+
+    private void test10ToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      //Uri siteUri = new Uri("http://MSIAfterburner:belomor@127.0.0.1:82/mahm");
+      //WebRequest wr = WebRequest.Create(siteUri);
+      //Log.Wrl(wr.GetResponse().ToString());
+
+      WebClient client = new WebClient();
+      client.Credentials = new System.Net.NetworkCredential("MSIAfterburner", "belomor");
+      Stream stream = client.OpenRead("http://@127.0.0.1:82/mahm");
+      StreamReader sr = new StreamReader(stream);
+
+      string newLine;
+      while ((newLine = sr.ReadLine()) != null)
+        Log.Wrl(newLine);
+    }
+
+    private void test11ToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      Log.Wrl(System.DateTime.ParseExact(" 13-06-2018 02:07:08".Trim(), "dd-MM-yyyy hh:mm:ss".Trim(), System.Globalization.CultureInfo.InvariantCulture).ToString());
     }
   }
 }

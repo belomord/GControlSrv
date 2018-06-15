@@ -74,6 +74,7 @@
       this.test8ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.test9ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.test10ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.test11ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.mSIABTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.miMSIABStart = new System.Windows.Forms.ToolStripMenuItem();
       this.miRestart = new System.Windows.Forms.ToolStripMenuItem();
@@ -84,7 +85,7 @@
       this.gPUInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.eDMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.miOpenEDM = new System.Windows.Forms.ToolStripMenuItem();
-      this.test11ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.test12ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.pnlMain.SuspendLayout();
       this.panel3.SuspendLayout();
       this.tbcMain.SuspendLayout();
@@ -489,7 +490,8 @@
             this.test8ToolStripMenuItem,
             this.test9ToolStripMenuItem,
             this.test10ToolStripMenuItem,
-            this.test11ToolStripMenuItem});
+            this.test11ToolStripMenuItem,
+            this.test12ToolStripMenuItem});
       this.miTest.Name = "miTest";
       this.miTest.Size = new System.Drawing.Size(40, 20);
       this.miTest.Text = "Test";
@@ -571,6 +573,13 @@
       this.test10ToolStripMenuItem.Text = "Test10";
       this.test10ToolStripMenuItem.Click += new System.EventHandler(this.test10ToolStripMenuItem_Click);
       // 
+      // test11ToolStripMenuItem
+      // 
+      this.test11ToolStripMenuItem.Name = "test11ToolStripMenuItem";
+      this.test11ToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+      this.test11ToolStripMenuItem.Text = "Test11";
+      this.test11ToolStripMenuItem.Click += new System.EventHandler(this.test11ToolStripMenuItem_Click);
+      // 
       // mSIABTestToolStripMenuItem
       // 
       this.mSIABTestToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -648,12 +657,12 @@
       this.miOpenEDM.Text = "Open EDM";
       this.miOpenEDM.Click += new System.EventHandler(this.miOpenEDM_Click);
       // 
-      // test11ToolStripMenuItem
+      // test12ToolStripMenuItem
       // 
-      this.test11ToolStripMenuItem.Name = "test11ToolStripMenuItem";
-      this.test11ToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
-      this.test11ToolStripMenuItem.Text = "Test11";
-      this.test11ToolStripMenuItem.Click += new System.EventHandler(this.test11ToolStripMenuItem_Click);
+      this.test12ToolStripMenuItem.Name = "test12ToolStripMenuItem";
+      this.test12ToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+      this.test12ToolStripMenuItem.Text = "Test12";
+      this.test12ToolStripMenuItem.Click += new System.EventHandler(this.test12ToolStripMenuItem_Click);
       // 
       // FrMain
       // 
@@ -747,6 +756,7 @@
     private System.Windows.Forms.ToolStripMenuItem test9ToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem test10ToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem test11ToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem test12ToolStripMenuItem;
   }
 }
 

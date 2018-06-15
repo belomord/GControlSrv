@@ -416,5 +416,17 @@ namespace GTest.Forms
     {
       Log.Wrl(System.DateTime.ParseExact(" 13-06-2018 02:07:08".Trim(), "dd-MM-yyyy hh:mm:ss".Trim(), System.Globalization.CultureInfo.InvariantCulture).ToString());
     }
+
+    private void test12ToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      //Log.Wrl(MSIABLog.GPULogParamTypes.Unknown.ToString());
+      //foreach (MSIABLog.GPULogParamTypes l in Enum.GetValues(typeof(MSIABLog.GPULogParamTypes)))
+      //  Log.Wrl(l.ToString());
+
+      MSIABLog log = new MSIABLog();
+      bool b = log.Load(@"D:\Work\Mining\App\GControl\GControlSrv\bin\Debug\HardwareMonitoring.hml");
+
+      Log.Wrl("MSIABLog: " + b.ToString());
+    }
   }
 }

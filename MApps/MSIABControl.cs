@@ -187,13 +187,11 @@ namespace MApps
     public static int GetAtiNvidiaCardIndex(string gpuId)
     {
       int result = -1;
-      int DrvTypeIndex;
-      GPUDrvType DrvType;
       int j = -1;
 
       for (int i = 0; i < GpuCount; i++)
       {
-        MSIABControl.GetType(i, out DrvType, out DrvTypeIndex);
+        MSIABControl.GetType(i, out GPUDrvType DrvType, out int DrvTypeIndex);
         if ((DrvType == GPUDrvType.AMD) || (DrvType == GPUDrvType.NVIDIA))
         {
           j++;
@@ -392,13 +390,35 @@ namespace MApps
 
   public class MSIABLog
   {
-    public class GPULog
+    public class GPULogInfo
     {
-      public string Device { get; set; } = "";
-      public int Index { get; set; } = -1;
+      public decimal Temperature= 0;
+      public decimal Usage = 0;
+      public decimal FBUsage = 0;
+      public decimal VIDUsage = 0;
+      public decimal BUSUsage = 0;
+      public decimal MemoryUsage = 0;
+      public decimal CoreClock = 0;
+      public decimal MemoryClock = 0;
+      public decimal Voltage = 0;
+      public decimal FanSpeed = 0;
+      public decimal FanTachometer = 0;
+      public decimal TempLimit = 0;
+      public decimal PowerLimit = 0;
+      public decimal VoltageLimit = 0;
     }
 
+    public class GPULog: List<GPULogInfo>
+    {
+      public int Index { get; set; } = -1;
+      public string Device { get; set; } = "";
 
+      public GPULog(int index, string device)
+      {
+        Index = index;
+        Device = device ?? throw new ArgumentNullException(nameof(device));
+      }
+    }
 
     public class LogStr
     {
@@ -411,7 +431,7 @@ namespace MApps
           Values = str.Split(new char[] {','}, StringSplitOptions.None).ToList<string>();
           Type = Convert.ToInt32(Values[0].Trim());
           Values.RemoveAt(0);
-          this.DateTime = System.DateTime.ParseExact(Values[1].Trim(), "dd-MM-yyyy hh:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+          this.DateTime = System.DateTime.ParseExact(Values[0].Trim(), "dd-MM-yyyy hh:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
           Values.RemoveAt(0);
           Correct = true;
         }
@@ -446,9 +466,69 @@ namespace MApps
 
     }
 
+    public List<GPULog> GPULogList { get; set; } = new List<GPULog>();
+
+
+    public enum GPULogParamTypes
+    {
+      Unknown,
+      Temperature,
+      Usage,
+      FBUsage,
+      VIDUsage,
+      BUSUsage,
+      MemoryUsage,
+      CoreClock,
+      MemoryClock,
+      Voltage,
+      FanSpeed,
+      FanTachometer,
+      TempLimit,
+      PowerLimit,
+      VoltageLimit,
+    }
+
+    public class GPULogParam
+    {
+      public int Index = -1;
+      public int GPUIndex = -1;
+      public GPULogParamTypes ParamType = GPULogParamTypes.Unknown;
+      public string Unit = "";
+      public decimal MinValue = 0;
+      public decimal MaxValue = 0;
+
+      public GPULogParam(int index, string typeStr)
+      {
+        Index = index;
+        string s = typeStr.Trim().ToUpper();
+
+        if (s.StartsWith("GPU"))
+        {
+          s = s.Substring(3).Trim();
+          int n = s.IndexOf(' ');
+
+          if (n > 0)
+          {
+            GPUIndex = Convert.ToInt32(s.Substring(0, n).Trim())-1;
+            s =  s.Substring(n).Trim().Replace(" ", "");
+
+            foreach (MSIABLog.GPULogParamTypes l in Enum.GetValues(typeof(MSIABLog.GPULogParamTypes)))
+            {
+              if (s == l.ToString().ToUpper())
+              {
+                ParamType = l;
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
     public bool Load(string fileName)
     {
       bool res = File.Exists(fileName.Trim());
+      GPULogList.Clear();
 
       try
       {
@@ -456,9 +536,9 @@ namespace MApps
         {
           using (StreamReader sr = new StreamReader(fileName.Trim(), Encoding.GetEncoding("windows-1251")))
           {
-            string s;
             LogStr ls = new LogStr();
-
+            List<GPULogParam> GPULogParamList = null;
+            int type03N = -1;
 
             while (sr.Peek() >= 0)
             {
@@ -474,10 +554,123 @@ namespace MApps
                 case 1:
                   for (int i = 0; i < ls.Values.Count; i++)
                   {
-
+                    if (!String.IsNullOrWhiteSpace(ls.Values[i].Trim()))
+                      GPULogList.Add(new GPULog(i, ls.Values[i].Trim()));
                   }
                   break;
 
+                case 2:
+                  GPULogParamList = new List<GPULogParam>(ls.Values.Count);
+                  for (int i = 0; i < ls.Values.Count; i++)
+                  {
+                    GPULogParamList.Add(new GPULogParam(i, ls.Values[i].Trim()));
+                  }
+                  break;
+
+                case 3:
+                  type03N++;
+
+                  for (int i = 0; i < ls.Values.Count; i++)
+                  {
+                    switch (i)
+                    {
+                      case 0:
+                        GPULogParamList[type03N].Index = Convert.ToInt32(ls.Values[i].Trim());
+                      break;
+
+                      case 1:
+                        GPULogParamList[type03N].Unit = ls.Values[i].Trim();
+                        break;
+
+                      case 2:
+                        GPULogParamList[type03N].MinValue = Convert.ToDecimal(ls.Values[i].Trim());
+                        break;
+
+                      case 3:
+                        GPULogParamList[type03N].MaxValue = Convert.ToDecimal(ls.Values[i].Trim());
+                        break;
+
+                      case 4:
+                        break;
+                    }
+                  }
+                  break;
+
+                case 80:
+                  for (int i = 0; i < GPULogList.Count; i++)
+                    GPULogList[i].Add(new GPULogInfo());
+
+                  decimal value = 0;
+                  GPULogInfo LogInfo = null;
+
+                  for (int i = 0; i < ls.Values.Count; i++)
+                  {
+                    value = Convert.ToDecimal(ls.Values[i].Trim());
+
+                    if (GPULogParamList[i].GPUIndex >= 0)
+                    {
+                      LogInfo = GPULogList[GPULogParamList[i].GPUIndex][GPULogList[GPULogParamList[i].GPUIndex].Count - 1];
+                      switch (GPULogParamList[i].ParamType)
+                      {
+                        case GPULogParamTypes.Temperature:
+                          LogInfo.Temperature = value;
+                          break;
+
+                        case GPULogParamTypes.Usage:
+                          LogInfo.Usage = value;
+                          break;
+
+                        case GPULogParamTypes.FBUsage:
+                          LogInfo.FBUsage = value;
+                          break;
+
+                        case GPULogParamTypes.VIDUsage:
+                          LogInfo.VIDUsage = value;
+                          break;
+
+                        case GPULogParamTypes.BUSUsage:
+                          LogInfo.BUSUsage = value;
+                          break;
+
+                        case GPULogParamTypes.MemoryUsage:
+                          LogInfo.MemoryUsage = value;
+                          break;
+
+                        case GPULogParamTypes.CoreClock:
+                          LogInfo.CoreClock = value;
+                          break;
+
+                        case GPULogParamTypes.MemoryClock:
+                          LogInfo.MemoryClock = value;
+                          break;
+
+                        case GPULogParamTypes.Voltage:
+                          LogInfo.Voltage = value;
+                          break;
+
+                        case GPULogParamTypes.FanSpeed:
+                          LogInfo.FanSpeed = value;
+                          break;
+
+                        case GPULogParamTypes.FanTachometer:
+                          LogInfo.FanTachometer = value;
+                          break;
+
+                        case GPULogParamTypes.TempLimit:
+                          LogInfo.TempLimit = value;
+                          break;
+
+                        case GPULogParamTypes.PowerLimit:
+                          LogInfo.PowerLimit = value;
+                          break;
+
+                        case GPULogParamTypes.VoltageLimit:
+                          LogInfo.VoltageLimit = value;
+                          break;
+                      }
+                  }
+                  }
+                  break;
               }
 
             }

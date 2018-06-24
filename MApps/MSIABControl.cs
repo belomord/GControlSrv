@@ -16,17 +16,39 @@ using Belomor.IniFile;
 namespace MApps
 {
 
-  public class MSIABConfigSettings
-  {
-    public string LogPath { get; set; } = "";
-    public int EnableLog { get; set; } = 0;
-    public int RecreateLog { get; set; } = 0;
-  }
-
   public class MSIABConfig
   {
-    //public MSIABConfigSettings Settings = new MSIABConfigSettings()
 
+    public class MSIABConfigSection
+    {
+      public MSIABConfigSection(string sectionName) => SectionName = sectionName ?? throw new ArgumentNullException(nameof(sectionName));
+      public string SectionName { get; private set; }
+    }
+
+    public class MSIABConfigSettings: MSIABConfigSection
+    {
+      public MSIABConfigSettings() : base("Settings") {}
+
+      public string LogPath { get; set; } = "";
+      public int EnableLog { get; set; } = 0;
+      public int RecreateLog { get; set; } = 0;
+    }
+
+
+
+    public MSIABConfigSettings Settings = new MSIABConfigSettings();
+
+    public bool Load(string iniFileName)
+    {
+      bool res = File.Exists(iniFileName);
+
+      if (res)
+      {
+        IniFile ini = new IniFile(iniFileName);
+      }
+
+      return res;
+    }
   }
 
   public struct MSIABProfileSettings
@@ -364,6 +386,7 @@ namespace MApps
         return MSIABControlState.ProcessError;
     }
 
+
   }
 
   public enum GPUDrvType: int
@@ -392,20 +415,26 @@ namespace MApps
   {
     public class GPULogInfo
     {
-      public decimal Temperature= 0;
-      public decimal Usage = 0;
-      public decimal FBUsage = 0;
-      public decimal VIDUsage = 0;
-      public decimal BUSUsage = 0;
-      public decimal MemoryUsage = 0;
-      public decimal CoreClock = 0;
-      public decimal MemoryClock = 0;
-      public decimal Voltage = 0;
-      public decimal FanSpeed = 0;
-      public decimal FanTachometer = 0;
-      public decimal TempLimit = 0;
-      public decimal PowerLimit = 0;
-      public decimal VoltageLimit = 0;
+      public GPULogInfo(DateTime dateTime)
+      {
+        DateTime = dateTime;
+      }
+
+      public DateTime DateTime { get; set; } = System.DateTime.MinValue;
+      public decimal Temperature { get; set; } = 0;
+      public decimal Usage { get; set; } = 0;
+      public decimal FBUsage { get; set; } = 0;
+      public decimal VIDUsage { get; set; } = 0;
+      public decimal BUSUsage { get; set; } = 0;
+      public decimal MemoryUsage { get; set; } = 0;
+      public decimal CoreClock { get; set; } = 0;
+      public decimal MemoryClock { get; set; } = 0;
+      public decimal Voltage { get; set; } = 0;
+      public decimal FanSpeed { get; set; } = 0;
+      public decimal FanTachometer { get; set; } = 0;
+      public decimal TempLimit { get; set; } = 0;
+      public decimal PowerLimit { get; set; } = 0;
+      public decimal VoltageLimit { get; set; } = 0;
     }
 
     public class GPULog: List<GPULogInfo>
@@ -459,7 +488,7 @@ namespace MApps
         Clear();
       }
 
-    public bool Correct { get; private set; } = false;
+      public bool Correct { get; private set; } = false;
       public int Type { get; private set; } = -1;
       public DateTime DateTime { get; private set; } = System.DateTime.MinValue;
       public List<string> Values { get; private set; } = new List<string>();
@@ -583,11 +612,11 @@ namespace MApps
                         break;
 
                       case 2:
-                        GPULogParamList[type03N].MinValue = Convert.ToDecimal(ls.Values[i].Trim());
+                        GPULogParamList[type03N].MinValue = CommonProc.ToDecimal(ls.Values[i]);
                         break;
 
                       case 3:
-                        GPULogParamList[type03N].MaxValue = Convert.ToDecimal(ls.Values[i].Trim());
+                        GPULogParamList[type03N].MaxValue = CommonProc.ToDecimal(ls.Values[i]);
                         break;
 
                       case 4:
@@ -598,14 +627,14 @@ namespace MApps
 
                 case 80:
                   for (int i = 0; i < GPULogList.Count; i++)
-                    GPULogList[i].Add(new GPULogInfo());
+                    GPULogList[i].Add(new GPULogInfo(ls.DateTime));
 
                   decimal value = 0;
                   GPULogInfo LogInfo = null;
 
                   for (int i = 0; i < ls.Values.Count; i++)
                   {
-                    value = Convert.ToDecimal(ls.Values[i].Trim());
+                    value = CommonProc.ToDecimal(ls.Values[i]);
 
                     if (GPULogParamList[i].GPUIndex >= 0)
                     {

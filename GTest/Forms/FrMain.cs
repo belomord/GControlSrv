@@ -17,6 +17,7 @@ using Belomor.MessageBoxEx;
 using Belomor.TimeMassageBox;
 using BSerialization;
 using MApps;
+using DeviceMgmt;
 
 using OpenHardwareMonitor.Hardware;
 
@@ -415,6 +416,7 @@ namespace GTest.Forms
     private void test11ToolStripMenuItem_Click(object sender, EventArgs e)
     {
       Log.Wrl(System.DateTime.ParseExact(" 13-06-2018 02:07:08".Trim(), "dd-MM-yyyy hh:mm:ss".Trim(), System.Globalization.CultureInfo.InvariantCulture).ToString());
+      Log.Wrl(CommonProc.DecimalToStr(10*CommonProc.ToDecimal("0.010", 5)).ToString());
     }
 
     private void test12ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -424,9 +426,29 @@ namespace GTest.Forms
       //  Log.Wrl(l.ToString());
 
       MSIABLog log = new MSIABLog();
+      int t = Environment.TickCount;
       bool b = log.Load(@"D:\Work\Mining\App\GControl\GControlSrv\bin\Debug\HardwareMonitoring.hml");
+      Log.Wrl("MSIABLog: " + b.ToString()+" ("+(Environment.TickCount - t)+")");
 
-      Log.Wrl("MSIABLog: " + b.ToString());
+      for (int i = 0; i < log.GPULogList.Count; i++)
+      {
+        Log.Wrl(String.Format("{0}: ", log.GPULogList[i].Device));
+
+        for (int j = 0; j < log.GPULogList[i].Count; j++)
+        {
+          Log.Wrl(String.Format("{0}: CoreClock: {1};  MemoryClock: {2}", log.GPULogList[i][j].DateTime, log.GPULogList[i][j].CoreClock, log.GPULogList[i][j].MemoryClock));
+        }
+        Log.Wrl("");
+      }
+    }
+
+    private void test13ToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      List<Win32DeviceMgmt.DeviceInfo> ldi = Win32DeviceMgmt.GetAllCOMPorts();
+      foreach (Win32DeviceMgmt.DeviceInfo di in ldi)
+      {
+        Log.Wrl(di.name + "; " + di.decsription);
+      }
     }
   }
 }

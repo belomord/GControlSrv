@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using Microsoft.Win32;
-
+using System.Globalization;
 
 
 namespace Belomor.Common
@@ -28,6 +28,32 @@ namespace Belomor.Common
 
   public static class CommonProc
   {
+    static CommonProc()
+    {
+      DecimalCultureInfo = CultureInfo.InvariantCulture.Clone() as CultureInfo;
+      DecimalCultureInfo.NumberFormat.NumberDecimalSeparator = ".";
+      DecimalCultureInfo.NumberFormat.NumberGroupSeparator = "";
+    }
+
+
+    public static CultureInfo DecimalCultureInfo;
+
+    public static decimal ToDecimal(string str, decimal defaultValue = 0)
+    {
+      try
+      {
+        string s = str.Trim().Replace(" ", "");
+        return Convert.ToDecimal(str, DecimalCultureInfo); 
+      }
+      catch 
+      {
+        return defaultValue;
+      }
+    }
+
+    public static string DecimalToStr(decimal Value) => Convert.ToString(Value, DecimalCultureInfo);
+
+
     public static string ApplicationExeName = Application.ExecutablePath;
     public static string ApplicationExePath = Path.GetDirectoryName(Application.ExecutablePath) + @"\";
 

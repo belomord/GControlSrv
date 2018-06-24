@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WMISample", "WMISample\WMIS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BSerialization", "Serialization\BSerialization.csproj", "{6DCF939A-C166-420B-A48F-770CC84BCBA2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceMgmt", "Win32DeviceMgmt\DeviceMgmt.csproj", "{67259F35-3292-4979-9473-1B98229156DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{6DCF939A-C166-420B-A48F-770CC84BCBA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6DCF939A-C166-420B-A48F-770CC84BCBA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6DCF939A-C166-420B-A48F-770CC84BCBA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67259F35-3292-4979-9473-1B98229156DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67259F35-3292-4979-9473-1B98229156DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67259F35-3292-4979-9473-1B98229156DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67259F35-3292-4979-9473-1B98229156DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

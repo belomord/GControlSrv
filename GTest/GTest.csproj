@@ -128,6 +128,10 @@
       <Project>{6dcf939a-c166-420b-a48f-770cc84bcba2}</Project>
       <Name>BSerialization</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Win32DeviceMgmt\DeviceMgmt.csproj">
+      <Project>{67259f35-3292-4979-9473-1b98229156df}</Project>
+      <Name>DeviceMgmt</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -16,6 +16,8 @@ namespace WMISample
 
         foreach (ManagementObject queryObj in searcher.Get())
         {
+          var aaa = queryObj["AcceleratorCapabilities"];
+
           Console.WriteLine("-----------------------------------");
           Console.WriteLine("Win32_VideoController instance");
           Console.WriteLine("-----------------------------------");
